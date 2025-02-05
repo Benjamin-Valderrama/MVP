@@ -14,7 +14,7 @@ The folder `data/` contains the raw data used in the generation of the plots bel
 
 # Table of contents
 
-1. [Making sense of cluttered PCAs](https://github.com/Benjamin-Valderrama/MVP/# 1.-Making-sense-of-cluttered-PCAs)
+1. [Making sense of cluttered PCAs](https://github.com/Benjamin-Valderrama/MVP/#1-making-sense-of-cluttered-pcas)
 
 # 1. Making sense of cluttered PCAs
 
