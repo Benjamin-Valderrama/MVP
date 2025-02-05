@@ -65,13 +65,13 @@ basic
 ```{r, fig.align='center'}
 bp_pc2 <- data %>% 
         ggplot(aes(x = group, y = pc2, fill = group)) +
-        geom_boxplot(show.legend = FALSE) +
+        geom_boxplot(show.legend = FALSE, outliers = FALSE) +
         scale_fill_viridis_d() + # custom colors
         theme_void()
 
 bp_pc1 <- data %>% 
         ggplot(aes(x = pc1, y = group, fill = group)) +
-        geom_boxplot(show.legend = FALSE) +
+        geom_boxplot(show.legend = FALSE, outliers = FALSE) +
         scale_fill_viridis_d() + # custom colors
         theme_void()
 
@@ -94,7 +94,7 @@ binning_pca <- function(group){
                 ggplot(aes(x = pc1, y = pc2)) +
                 # we add the background with all the observations in grey
                 geom_bin_2d(bins = 20) +
-                scale_fill_gradient(low = "grey40", high = "grey40") +
+                scale_fill_gradient(low = "grey50", high = "grey50") +
                 
                 # we add the data of the group of interest on top
                 new_scale("fill") +
@@ -106,6 +106,7 @@ binning_pca <- function(group){
                 
                 coord_fixed() +
                 
+                theme_minimal() +
                 theme(legend.position = "none")
 }
 
