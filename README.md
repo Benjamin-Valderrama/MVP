@@ -18,12 +18,12 @@ The folder `data/` contains the raw data used in the generation of the plots bel
 
 # 1. Making sense of cluttered PCAs
 
-Principal Component Analysis (PCA) plots are ubiquitous in the microbiome literature, thus it has to be the first visualization to cover. They are a simplified 2D representation of the multiple differences between samples. Thus, higher distances between any pair of sample, represent more dissimilarity between them in the (original) multidimensional space. 
+<div align="justify"> Principal Component Analysis (PCA) plots are ubiquitous in the microbiome literature, thus it has to be the first visualization to cover. They are a simplified 2D representation of the multiple differences between samples. Thus, higher distances between any pair of samples represent higher dissimilarity between them in the (original) multidimensional space. 
 
-Then task of this visualization is to accurately show distances between samples or groups. It's easy to see than when we deal with many samples (like in the example below), PCA plots are very cluttered making it impossible to determine those distances.
+Then task of this visualization is to accurately show distances between samples or groups. It's easy to see than when we deal with many samples (like in the example below), PCA plots are very cluttered making it impossible to determine those distances.</div>
 
 ![cluttered_pcas](https://github.com/Benjamin-Valderrama/MVP/blob/main/figures/alternatives_to_cluttered_pca.png)
 
-One solution is to add boxplots (or density plots) on the sides of the principal components, to show the distribution of each group along them. This is a fairly common solution in the literature, and it is often enough. 
+<div align="justify"> One solution is to add boxplots (or density plots) on the sides of the principal components, to show the distribution of each group along them. This is a fairly common solution in the literature, and it is often enough. 
 
-Although less popular, another solution is to make bins on the PCA space, plot all data in the background and then add on top the distribution of the samples from each group, as shown in the three plots below.
+Although less popular, another solution is to make bins on the PCA space, plot all data in the background and then add on top the distribution of the samples from each group, as shown in the three plots below.</div>
