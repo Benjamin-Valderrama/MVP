@@ -24,16 +24,16 @@ library(ggnewscale) # to use more than one color scale in a plot
 ```{r}
 set.seed(1997)
 
-group1 <- data.frame(pc1 = rnorm(1000, mean = 0.5),
-                     pc2 = rnorm(1000),
+group1 <- data.frame(PC1 = rnorm(1000, mean = 0.5),
+                     PC2 = rnorm(1000),
                      group = "group_1")
 
-group2 <- data.frame(pc1 = rnorm(1000, mean = -0.5),
-                     pc2 = rnorm(1000, mean = 0.5, sd = 0.75),
+group2 <- data.frame(PC1 = rnorm(1000, mean = -0.5),
+                     PC2 = rnorm(1000, mean = 0.5, sd = 0.75),
                      group = "group_2")
 
-group3 <- data.frame(pc1 = rnorm(1000, sd = 1.5),
-                     pc2 = rnorm(1000, mean = -0.5),
+group3 <- data.frame(PC1 = rnorm(1000, sd = 1.5),
+                     PC2 = rnorm(1000, mean = -0.5),
                      group = "group_3")
 
 data <- rbind(group1, group2, group3)
@@ -50,7 +50,7 @@ head(data)
 
 ```{r, fig.align='center'}
 basic <- data %>% 
-        ggplot(aes(x = pc1, y = pc2, fill = group)) +
+        ggplot(aes(x = PC1, y = PC2, fill = group)) +
         geom_point(shape = 21, size = 2, alpha = 0.75) +
         scale_fill_viridis_d() + # custom colors
         theme_minimal() +
@@ -64,13 +64,13 @@ basic
 
 ```{r, fig.align='center'}
 bp_pc2 <- data %>% 
-        ggplot(aes(x = group, y = pc2, fill = group)) +
+        ggplot(aes(x = group, y = PC2, fill = group)) +
         geom_boxplot(show.legend = FALSE, outliers = FALSE) +
         scale_fill_viridis_d() + # custom colors
         theme_void()
 
 bp_pc1 <- data %>% 
-        ggplot(aes(x = pc1, y = group, fill = group)) +
+        ggplot(aes(x = PC1, y = group, fill = group)) +
         geom_boxplot(show.legend = FALSE, outliers = FALSE) +
         scale_fill_viridis_d() + # custom colors
         theme_void()
@@ -91,7 +91,7 @@ binning_pca <- function(group){
                 filter(group == {{group}})
         
         data %>% 
-                ggplot(aes(x = pc1, y = pc2)) +
+                ggplot(aes(x = PC1, y = PC2)) +
                 # we add the background with all the observations in grey
                 geom_bin_2d(bins = 20) +
                 scale_fill_gradient(low = "grey50", high = "grey50") +
