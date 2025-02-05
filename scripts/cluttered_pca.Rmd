@@ -122,7 +122,7 @@ first_row <- ((basic | pca_with_bp) &
 
 first_row / binned_pca + plot_layout(heights = c(0.8, 1))
 
-ggsave(filename = "../figures/alternatives_to_cluttered_pca.png", height = 6, width = 6)
-ggsave(filename = "../figures/alternatives_to_cluttered_pca.svg", height = 6, width = 6)
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.png", height = 4, width = 6)
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.svg", height = 4, width = 6)
 
 ```
