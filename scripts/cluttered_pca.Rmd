@@ -1,0 +1,127 @@
+---
+title: "Fixing Cluttered PCA plots"
+author: "B. Valderrama"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparation
+
+### Required packages 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse) # work with data and plotting
+library(patchwork) # 'paste' plot together
+library(ggnewscale) # to use more than one color scale in a plot
+```
+
+
+### Generating data
+
+```{r}
+set.seed(1997)
+
+group1 <- data.frame(pc1 = rnorm(1000, mean = 0.5),
+                     pc2 = rnorm(1000),
+                     group = "group_1")
+
+group2 <- data.frame(pc1 = rnorm(1000, mean = -0.5),
+                     pc2 = rnorm(1000, mean = 0.5, sd = 0.75),
+                     group = "group_2")
+
+group3 <- data.frame(pc1 = rnorm(1000, sd = 1.5),
+                     pc2 = rnorm(1000, mean = -0.5),
+                     group = "group_3")
+
+data <- rbind(group1, group2, group3)
+
+# mix the observations to avoid that groups cover each other
+data <- data[sample(1:nrow(data), size = nrow(data)), ]
+
+head(data)
+```
+
+# Plotting
+
+### Cluttered PCA
+
+```{r, fig.align='center'}
+basic <- data %>% 
+        ggplot(aes(x = pc1, y = pc2, fill = group)) +
+        geom_point(shape = 21, size = 2, alpha = 0.75) +
+        scale_fill_viridis_d() + # custom colors
+        theme_minimal() +
+        theme(legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12))
+
+basic 
+```
+
+### Box or density plots
+
+```{r, fig.align='center'}
+bp_pc2 <- data %>% 
+        ggplot(aes(x = group, y = pc2, fill = group)) +
+        geom_boxplot(show.legend = FALSE) +
+        scale_fill_viridis_d() + # custom colors
+        theme_void()
+
+bp_pc1 <- data %>% 
+        ggplot(aes(x = pc1, y = group, fill = group)) +
+        geom_boxplot(show.legend = FALSE) +
+        scale_fill_viridis_d() + # custom colors
+        theme_void()
+
+pca_with_bp <- bp_pc1 + plot_spacer() + basic + bp_pc2 +
+        plot_layout(heights = c(1, 10), 
+                    widths = c(10, 1), 
+                    guides = "collect"); pca_with_bp
+```
+
+### Binning PCA space
+
+```{r, fig.align='center'}
+binning_pca <- function(group){
+        
+        # data of the group of interest 
+        group_df <- data %>% 
+                filter(group == {{group}})
+        
+        data %>% 
+                ggplot(aes(x = pc1, y = pc2)) +
+                # we add the background with all the observations in grey
+                geom_bin_2d(bins = 20) +
+                scale_fill_gradient(low = "grey40", high = "grey40") +
+                
+                # we add the data of the group of interest on top
+                new_scale("fill") +
+                geom_bin_2d(data = group_df, bins = 20) +
+                scale_fill_continuous(type = "viridis") +
+                
+                # add a title to identify the group
+                labs(title = gsub(x = group, pattern = "_", replacement = " ")) +
+                
+                coord_fixed() +
+                
+                theme(legend.position = "none")
+}
+
+binned_pca <- lapply(c("group_1", "group_2", "group_3"), binning_pca) %>% 
+        wrap_plots(nrow = 1); binned_pca
+```
+
+## Show alternatives to the cluttered PCA
+
+```{r, fig.align='center'}
+first_row <- ((basic | pca_with_bp) & 
+                      theme(legend.position = "none"))
+
+first_row / binned_pca + plot_layout(heights = c(0.8, 1))
+
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.png", height = 6, width = 6)
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.svg", height = 6, width = 6)
+
+```
