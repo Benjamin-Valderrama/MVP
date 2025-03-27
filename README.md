@@ -4,7 +4,7 @@ This is an opinionated essay on good and bad practices in microbiome data visual
 
 This work is inspired by [Friends Don't Let Friends Make Bad Graphs](https://github.com/cxli233/FriendsDontLetFriends/tree/main?tab=readme-ov-file), so I'll minimize overlap between repositories as much as possible.
 
-The folder `data/` contains the raw data used in the generation of the plots below. The code to generate the figures in `.Rmd` format can be found in the `scripts/` folder, and the output files are stored in `figures/`.
+The folder `data/` contains the raw data used in the generation of the plots below. The code to generate the figures in `.Rmd` format can be found in the `scripts/` folder, and the output files are stored in `figures/`. Note that you by clicking on the visualizations you can see the code used to build them.
 
 #### **About me**
 
@@ -21,6 +21,6 @@ The first visualization I choose to cover are Principal Component Analysis (PCA)
 
 It's easy to see than when dealing with many samples, PCA plots are very cluttered making it impossible to determine differences between the study groups (shown in different colors). One solution is to add boxplots (or density plots) alongside the principal components to illustrate the distribution of each group. This approach is fairly common in the literature and is often enough
 
-A less common alternative (although effective) is to make bins on the PCA space and to build multiple plots with density distributions for each group, as shown in the three plots on the bottom. However, when working with more than three groups, this approach may lose effectiveness.
+A less common alternative (although effective) is to bin the PCA space, plot all distributions and background and build plots to highlight the distribution of each group, as shown in the three plots on the bottom. However, when working with more than three groups, this approach may lose effectiveness.
 
-![](figures/alternatives_to_cluttered_pca.png)
+[![](figures/alternatives_to_cluttered_pca.png) ](https://github.com/Benjamin-Valderrama/MVP/blob/main/scripts/cluttered_pca.Rmd)
