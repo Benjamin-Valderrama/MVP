@@ -21,6 +21,6 @@ The first visualization I choose to cover are Principal Component Analysis (PCA)
 
 It's easy to see than when dealing with many samples, PCA plots are very cluttered making it impossible to determine differences between the study groups (shown in different colors). One solution is to add boxplots (or density plots) alongside the principal components to illustrate the distribution of each group. This approach is fairly common in the literature and is often enough
 
-A less common alternative (although effective) is to make bins on the PCA space and to build multiple plots with density distributions for each group, as shown in the three plots on the bottom. However, when working with more than 3 groups this alternative might loose effectiveness.
+A less common alternative (although effective) is to make bins on the PCA space and to build multiple plots with density distributions for each group, as shown in the three plots on the bottom. However, when working with more than three groups, this approach may lose effectiveness.
 
 ![](figures/alternatives_to_cluttered_pca.png)
