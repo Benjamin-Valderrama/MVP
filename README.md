@@ -4,7 +4,7 @@ This is an opinionated essay on good and bad practices in microbiome data visual
 
 This work is inspired by [Friends Don't Let Friends Make Bad Graphs](https://github.com/cxli233/FriendsDontLetFriends/tree/main?tab=readme-ov-file), so I'll minimize overlap between repositories as much as possible.
 
-The folder `data/` contains the raw data used in the generation of the plots below. The code to generate the figures in `.Rmd` format can be found in the `scripts/` folder, and the output files are stored in `figures/`. Note that you by clicking on the visualizations you can see the code used to build them.
+The folder `data/` contains the raw data used in the generation of the plots below. The code to generate the figures in `.Rmd` format can be found in the `scripts/` folder, and the output files are stored in `figures/`. Note that you can see the code used to build the visualizations by clicking on them.
 
 #### **About me**
 
