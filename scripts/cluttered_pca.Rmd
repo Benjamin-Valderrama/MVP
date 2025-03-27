@@ -62,23 +62,21 @@ basic
 
 ### Box or density plots
 
-```{r, fig.align='center'}
-bp_pc2 <- data %>% 
-        ggplot(aes(x = group, y = PC2, fill = group)) +
-        geom_boxplot(show.legend = FALSE, outliers = FALSE) +
-        scale_fill_viridis_d() + # custom colors
-        theme_void()
+One alternative commonly used in the microbiome literature is to add plots on
+the top and side of the PCA to show the distribution of the groups across the 
+axes. Here I show box plots, but density plots are another common choice. 
 
-bp_pc1 <- data %>% 
-        ggplot(aes(x = PC1, y = group, fill = group)) +
-        geom_boxplot(show.legend = FALSE, outliers = FALSE) +
-        scale_fill_viridis_d() + # custom colors
-        theme_void()
+```{r, fig.align='center', warning=FALSE, message=FALSE}
+library(ggside)
 
-pca_with_bp <- bp_pc1 + plot_spacer() + basic + bp_pc2 +
-        plot_layout(heights = c(1, 10), 
-                    widths = c(10, 1), 
-                    guides = "collect"); pca_with_bp
+pca_with_bp <- basic +
+        geom_xsideboxplot(orientation = "y", 
+                          outliers = FALSE, 
+                          show.legend = FALSE) +
+        geom_ysideboxplot(orientation = "x",
+                          outliers = FALSE, 
+                          show.legend = FALSE) +
+        theme_ggside_void(); pca_with_bp
 ```
 
 ### Binning PCA space
@@ -110,19 +108,20 @@ binning_pca <- function(group){
                 theme(legend.position = "none")
 }
 
-binned_pca <- lapply(c("group_1", "group_2", "group_3"), binning_pca) %>% 
-        wrap_plots(nrow = 1); binned_pca
+binned_pcas <- lapply(c("group_1", "group_2", "group_3"), binning_pca) %>% 
+        wrap_plots(nrow = 1); binned_pcas
 ```
 
 ## Show alternatives to the cluttered PCA
 
 ```{r, fig.align='center'}
-first_row <- ((basic | pca_with_bp) & 
-                      theme(legend.position = "none"))
 
-first_row / binned_pca + plot_layout(heights = c(0.8, 1))
+first_row <- ((basic | pca_with_bp) & theme(legend.position = "none"))
+ 
+first_row / binned_pcas
 
-ggsave(filename = "../figures/alternatives_to_cluttered_pca.png", height = 4, width = 6)
-ggsave(filename = "../figures/alternatives_to_cluttered_pca.svg", height = 4, width = 6)
+# export figures
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.png", height = 4.5, width = 6)
+ggsave(filename = "../figures/alternatives_to_cluttered_pca.svg", height = 4.5, width = 6)
 
 ```
