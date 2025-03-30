@@ -1,0 +1,190 @@
+---
+title: "longitudinal_data_pcas"
+author: "B. Valderrama"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparation
+
+### Required packages 
+```{r, warning=FALSE, message=FALSE}
+library(curatedMetagenomicData) # sccessing real microbiome data
+library(tidyverse) # to work with data and plotting
+library(patchwork) # 'paste' plot together
+library(svglite) # to save figure as svg
+```
+
+
+## Retrieving the data
+
+```{r message=FALSE}
+set.seed(1997)
+
+tse <- sampleMetadata %>% 
+        filter(study_name == "HallAB_2017") %>% 
+        returnSamples(dataType = "relative_abundance", counts = TRUE, rownames = "short")
+
+ct <- tse %>% assay() %>% as.data.frame()
+
+metadata <- tse %>% colData() %>% 
+        as.data.frame() %>% 
+        select(subject_id, disease, visit_number) %>% 
+        rownames_to_column("sample") 
+
+```
+
+## Bad visualization option
+
+### Manipulating the data
+
+Note that I've decided to manipulate the data using functions from the collection of packages available in tidyverse. However, other approaches like those described in [OMA]() can be used. They require less code and are well documented.
+
+I've decided to not use them just because I wanted to show the steps involved in generating such visuals.
+
+```{r}
+clr_ct <- vegan::decostand(ct, method = "clr", pseudocount = 2/3)
+
+pca <- prcomp(t(clr_ct))
+
+pca_data <- pca$x %>% 
+        as.data.frame() %>% 
+        rownames_to_column("sample") %>% 
+        select(sample, PC1, PC2) %>% 
+        inner_join(x = .,
+                   y = metadata,
+                   by = "sample")
+
+clean_pca_data <- pca_data %>% 
+        arrange(subject_id, visit_number) %>% 
+        as_tibble() %>% 
+        # add the coordinates of the arrows
+        # (with NAs for the first and last observation 
+        # of each individual)
+        mutate(xend = ifelse(visit_number == max(visit_number),
+                             NA,
+                             lead(PC1)),
+               yend = ifelse(visit_number == max(visit_number),
+                             NA,
+                             lead(PC2)),
+               .by = subject_id)
+```
+
+### Generating the visualization
+
+```{r warning=FALSE, message=FALSE}
+bad_option <- clean_pca_data %>% 
+
+        ggplot(aes(x = PC1, y = PC2, fill = disease)) +
+        geom_point(shape = 21, size = 2, stroke = 0.5) +
+        geom_segment(aes(xend = xend, yend = yend),
+                     size = 2,
+                     linewidth = unit(0.05, "cm"),
+                     arrow = arrow(length = unit(0.1, "cm"),
+                                   type = "closed")) +
+
+        scale_fill_manual(values = c("IBD" = "tomato3", "healthy" = "grey40"),
+                          breaks = c("IBD", "healthy"),
+                          labels = c("Disease", "Control")) +
+        labs(title = "Impossible to identify temporal dynamics",
+             fill = "Group") +
+        guides(fill = guide_legend(override.aes = list(size = 4))) +
+        
+        theme_bw() +
+        theme(title = element_text(size = 10, color = "black"),
+              text = element_text(size = 8, color = "black"),
+              axis.text = element_text(color = "black"),
+              panel.grid.minor = element_blank()); bad_option
+```
+
+
+## Good visualization option
+
+### Manipulating the data
+
+```{r}
+dist <- vegan::vegdist(x = t(ct), method = "aitchison", pseudocount = 2/3)
+
+dist_long <- as.matrix(dist) %>% 
+        reshape2::melt(varnames = c("from", "to"),
+                       value.name = "dist") %>% 
+        mutate(from = as.character(from),
+               to = as.character(to)) %>% 
+        as_tibble()
+
+
+clean_dist_long <- dist_long %>% 
+        # Get one triangle and diagonal from the distance matrix
+        filter(from <= to) %>% 
+        # Add metadata to each observation 
+        inner_join(x = .,
+                   y = metadata,
+                   by = join_by(from == sample)) %>% 
+        inner_join(x = .,
+                   y = metadata,
+                   by = join_by(to == sample), suffix = c("_from", "_to")) %>% 
+        
+        # Keep only the data used for plotting:
+        # 1. distances between same subject over time
+        filter(subject_id_from == subject_id_to) %>% 
+        
+        # 2. Keep all comparisons between the first timepoint and the rest for each subject
+        filter(visit_number_from == min(visit_number_from), .by = subject_id_from) %>% 
+        
+        # add distance between timepoints (used to plot on the X axis)
+        mutate(time_diff = abs(visit_number_from - visit_number_to)) %>% 
+        select(!c(visit_number_from, visit_number_to))
+```
+
+### Generating the visualization
+
+```{r warning=FALSE, message=FALSE}
+good_option <- clean_dist_long %>% 
+        ggplot(aes(x = time_diff, y = dist, color = disease_to)) +
+        
+        geom_line(aes(group = from),
+                  linewidth = 0.5,
+                  alpha = 0.35) +
+        geom_smooth(aes(color = disease_to), size = 1,
+                    show.legend = FALSE) +
+        
+        labs(x = "Weeks after first sampling",
+             y = "Aitchison's distance",
+             title = "Clear display of temporal variability",
+             color = "Group") +
+        
+        scale_color_manual(values = c("IBD" = "tomato3", "healthy" = "grey40"),
+                           breaks = c("IBD", "healthy"),
+                           labels = c("Disease", "Control")) +
+        
+        scale_x_continuous(expand = c(0,0),
+                           limits = c(0, 11),
+                           breaks = seq(0, 10, by = 2)) +
+        scale_y_continuous(expand = c(0,0),
+                           limits = c(-0.25, 122),
+                           breaks = seq(0, 120, by = 30)) +
+        
+        guides(color = guide_legend(override.aes = list(linewidth = 1, 
+                                                        alpha = 1))) +
+        
+        theme_classic() +
+        theme(title = element_text(size = 10, color = "black"),
+              text = element_text(size = 8, color = "black"),
+              axis.text = element_text(color = "black")); good_option
+```
+
+### Make final plot
+
+```{r warning=FALSE, message=FALSE}
+final_plot <- bad_option / good_option; final_plot
+
+ggsave(filename = "../figures/proper_longitudinal_dynamics.png",
+       plot = final_plot, width = 4, height = 4) 
+
+ggsave(filename = "../figures/proper_longitudinal_dynamics.svg",
+       plot = final_plot, width = 4, height = 4) 
+```
